@@ -6,12 +6,13 @@ using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour
 {
     public float speed;
-    public Vector2 moveValue;
+    private Vector2 moveValue;
+    private int count;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        count = 0;
     }
 
     // Update is called once per frame
@@ -36,6 +37,7 @@ public class PlayerController : MonoBehaviour
         if(other.gameObject.tag == "PickUp") 
         { 
             other.gameObject.SetActive(false);
+            count += 1;
         }
     }
 }
