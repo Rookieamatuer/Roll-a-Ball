@@ -17,14 +17,14 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         count = 0;
-        winText.text = "";
+        winText.text = "";      
         SetCountText();
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
     void OnMove(InputValue value)
