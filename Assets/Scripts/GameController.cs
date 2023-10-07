@@ -14,6 +14,7 @@ public class GameController : MonoBehaviour
     private Vector3 oldPosition;
     private float playerVelocity;
     private float distance;
+    private Rigidbody rb;
     private LineRenderer lineRenderer;
     private Mode modes;
     /*private GameObject[] pickUps;*/
@@ -23,6 +24,7 @@ public class GameController : MonoBehaviour
     {
         oldPosition = transform.position;
         playerVelocity = 0f;
+        rb = GetComponent<Rigidbody>();
         lineRenderer = gameObject.AddComponent<LineRenderer>();
         //lineRenderer.GetComponent<LineRenderer>().enabled = false;
         modes = 0;
@@ -31,11 +33,12 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // switch mode
         if(Input.GetKeyDown(KeyCode.Space))
         {
-            //Debug.Log(Enum.GetValues(typeof(States)).Length);
+            // Debug.Log(Enum.GetValues(typeof(States)).Length);
             modes = (Mode)(((int)modes + 1) % 3);
-            Debug.Log(modes);
+            // Debug.Log(modes);
         }
 
         GameObject[] pickUps = GameObject.FindGameObjectsWithTag("PickUp");
@@ -43,14 +46,15 @@ public class GameController : MonoBehaviour
         switch (modes)
         {
             case Mode.Normal:
-                foreach(GameObject gameObject in pickUps)
                 {
-                    gameObject.GetComponent<Renderer>().material.color = Color.white;
-                }
-                DistanceText.gameObject.SetActive(false);
-                lineRenderer.GetComponent<LineRenderer>().enabled = false;
-                /*SetDebugText(false);*/
-                break;
+                    foreach(GameObject gameObject in pickUps)
+                    {
+                        gameObject.GetComponent<Renderer>().material.color = Color.white;
+                    }
+                    //DistanceText.gameObject.SetActive(false);
+                    lineRenderer.GetComponent<LineRenderer>().enabled = false;
+                    /*SetDebugText(false);*/
+                }break;
             
             case Mode.Distance:
                 {
@@ -61,36 +65,27 @@ public class GameController : MonoBehaviour
                     playerVelocity = (transform.position - oldPosition).magnitude / Time.deltaTime;
                     oldPosition = transform.position;
                     DistanceCalculate(Color.blue, false, pickUps);
-                    SetDebugText(true);
+                    SetDebugText();
                 }break;
 
             case Mode.Vision:
-                PlayerPositionText.gameObject.SetActive(false);
-                PlayerVelocityText.gameObject.SetActive(false);
-                DistanceText.gameObject.SetActive(true);
-                //lineRenderer.GetComponent<LineRenderer>().enabled = true;
-                DistanceCalculate(Color.green, true, pickUps);
-                SetDebugText(true);
-                break;
+                {
+                    PlayerPositionText.gameObject.SetActive(false);
+                    PlayerVelocityText.gameObject.SetActive(false);
+                    DistanceText.gameObject.SetActive(false);
+                    //lineRenderer.GetComponent<LineRenderer>().enabled = true;
+                    DistanceCalculate(Color.green, true, pickUps);
+                    // SetDebugText();
+                }break;
         }
     }
 
     //Setting debug text
-    private void SetDebugText(bool active)
+    private void SetDebugText()
     {
-        if(active)
-        {
             PlayerPositionText.text = "PlayerPosition: " + oldPosition.ToString();
             PlayerVelocityText.text = "PlayerVelocity: " + playerVelocity.ToString("0.00") + "unit/s";
-            DistanceText.text = "Distance: " + distance.ToString("0.00");
-        }
-        else
-        {
-            PlayerPositionText.text = "";
-            PlayerVelocityText.text = "";
-            DistanceText.text = "" ;
-        }
-        
+            DistanceText.text = "Distance: " + distance.ToString("0.00");        
     }
 
     //Calculating distance between cloest pickup and player
@@ -111,14 +106,14 @@ public class GameController : MonoBehaviour
             pickUps[i].GetComponent<Renderer>().material.color = Color.white;
         }
         pickUps[target].GetComponent<Renderer>().material.color = targetColor;
-        if(vision)
+        if (vision)
         {
             pickUps[target].transform.LookAt(transform.position);
-            RenderDistance(transform.position, transform.position + (transform.position  - oldPosition));
+            RenderDistance(transform.position, transform.position + rb.velocity);   // draw a line that shows the current velocity
         }
         else
         {
-            RenderDistance(transform.position, endPosition);
+            RenderDistance(transform.position, endPosition);    // draw a line between player and cloest pickUp
         }
     }
 
